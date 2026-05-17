@@ -1,10 +1,10 @@
 import './App.css'
-import SalaryBreakup from './components/SalaryBreakup'
+import SalaryDetails from './components/salaryDetails/SalaryDetails'
 
 function App() {
 
   return (
-    <SalaryBreakup/>
+    <SalaryDetails />
   )
 }
 
