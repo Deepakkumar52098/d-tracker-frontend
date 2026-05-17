@@ -1,44 +1,43 @@
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
+import {
+    Box,
+    FormControl,
+    IconButton,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import { useEffect, useState } from 'react'
 
-const DisplayDetails = ({ showAddDetails, invokeApi, setInvokeApi }) => {
-    const [salaryDetails, setSalaryDetails] = useState([])
-    useEffect(() => {
-        if (invokeApi) {
-            fetch('http://localhost:8080/salaryBreakup/getDetails')
-                .then(res => {
-                    if (res.status === 200) {
-                        return res.json()
-                    }
-                    throw new Error('Failed to fetch details')
-                })
-                .then(data => {
-                    setSalaryDetails(data.breakupDetails)
-                    setInvokeApi(false)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        }
-    }, [showAddDetails, invokeApi, setInvokeApi])
+const DisplayDetails = ({ setInvokeApi, yearFilter, setYearFilter, salaryDetails, setIsError, setShowAlert, setAlertMessage }) => {
+
+    const yearFilterOptions = ['2026', '2025']
 
     const handleDelete = (event, data) => {
         fetch('http://localhost:8080/salaryBreakup/deleteDetail/' + data._id, {
             method: 'DELETE'
         })
-            .then(res => {
+            .then(async (res) => {
+                const data = await res.json()
+                setShowAlert(true)
                 if (res.status === 200) {
-                    return true
+                    setIsError(false)
+                    setAlertMessage(data.message)
+                    setInvokeApi(true)
+                    return
                 }
-                throw new Error('Delete action failed')
-            })
-            .then(resData => {
-                setInvokeApi(resData)
+                throw new Error(data.message)
             })
             .catch(err => {
-                console.log(err)
+                setIsError(true)
+                setAlertMessage(err)
             })
     }
 
@@ -47,43 +46,114 @@ const DisplayDetails = ({ showAddDetails, invokeApi, setInvokeApi }) => {
     }
 
     const getDate = (date) => {
+        if (date === 'Total') {
+            return date
+        }
         return new Date(date).toLocaleString('en-US', {
-            month: 'long',
+            month: 'short',
             year: 'numeric'
         });
+    }
+
+    const handleYearFilterChange = (e) => {
+        setYearFilter(e.target.value)
+        setInvokeApi(true)
     }
 
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
-                    <TableRow>
+                    <TableRow
+                        sx={{
+                            backgroundColor: '#1976d2',
+                        }}
+                    >
+                        <TableCell>
+                            <FormControl
+                                size="small"
+                                fullWidth
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    justifyContent: 'start',
+                                    alignItems: 'center',
+                                    borderRight: '1px solid black'
+                                }}>
+                                <Typography
+                                    sx={{
+                                        marginRight: '5px'
+                                    }}
+                                >
+                                    Year:
+                                </Typography>
+                                <Select
+                                    value={yearFilter}
+                                    onChange={(e) => handleYearFilterChange(e)}
+                                    displayEmpty
+                                >
+                                    {yearFilterOptions.map((year) => (
+                                        <MenuItem key={year} value={year}>{year}</MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </TableCell>
+                        <TableCell colSpan={6} align='center'>Salary Breakup Details</TableCell>
+                    </TableRow>
+                    <TableRow
+                        sx={{
+                            backgroundColor: 'lightBlue',
+                        }}>
                         <TableCell>Date</TableCell>
                         <TableCell>Income</TableCell>
                         <TableCell align="right">Expenses</TableCell>
                         <TableCell align="right">Emergency Fund</TableCell>
                         <TableCell align="right">Savings</TableCell>
-                        <TableCell align="right">Vacation</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell
+                            align="right"
+                            sx={{
+                                borderRight: '1px solid #ddd'
+                            }}
+                        >Vacation</TableCell>
+                        <TableCell align="center">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {salaryDetails.map((data) => (
+                    {salaryDetails?.map((data) => (
                         <TableRow
                             key={data._id}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            sx={{
+                                backgroundColor: data._id === 'Total' ? 'lightGreen' : null
+                            }}
                         >
                             <TableCell component="th" scope="row">{getDate(data?.date)}</TableCell>
                             <TableCell component="th" scope="row">{data?.income}</TableCell>
                             <TableCell align="right">{data?.expenses}</TableCell>
                             <TableCell align="right">{data?.emergencyFund}</TableCell>
                             <TableCell align="right">{data?.savings}</TableCell>
-                            <TableCell align="right">{data?.vacation}</TableCell>
-                            <TableCell align="right">
-                                <IconButton>
-                                    <DeleteIcon onClick={(e) => handleDelete(e, data)} />
-                                    <EditIcon onClick={handleEdit} />
-                                </IconButton>
+                            <TableCell
+                                align="right"
+                                sx={{
+                                    borderRight: '1px solid #ddd'
+                                }}
+                            >{data?.vacation}</TableCell>
+                            <TableCell align="center">
+                                {data?._id === 'Total' ? null : <Box
+                                    sx={{
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: 1,
+                                        backgroundColor: 'transparent',
+                                    }}>
+                                    <IconButton>
+                                        <DeleteIcon onClick={(e) => handleDelete(e, data)} />
+                                    </IconButton>
+                                    <IconButton>
+                                        <EditIcon onClick={handleEdit} />
+                                    </IconButton>
+                                </Box>
+                                }
                             </TableCell>
                         </TableRow>
                     ))}
