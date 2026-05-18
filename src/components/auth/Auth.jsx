@@ -1,0 +1,54 @@
+import { Box, Tabs, Tab } from '@mui/material'
+import { useState } from 'react'
+import SignUp from './SignUp'
+
+const Auth = ({ handleLogin }) => {
+    const [value, setValue] = useState(0)
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue)
+    }
+
+    const handleButtonClick = () => {
+        // value 1 is Login & value 0 is Signup
+        if (value) {
+            handleLogin()
+        }
+    }
+
+    return (
+        <Box
+            sx={{
+                width: '20%',
+                marginLeft: '40%',
+                marginRight: '40%',
+                marginTop: '10%',
+                border: '1px solid #ccc',
+                borderRadius: 2,
+                overflow: 'hidden',
+                bgcolor: '#fff'
+            }}
+        >
+            <Tabs
+                value={value}
+                onChange={handleChange}
+                variant="fullWidth"
+                indicatorColor="secondary"
+                sx={{ bgcolor: '#1976d2' }}
+            >
+                <Tab
+                    sx={{ color: '#fff', '&.Mui-selected': { color: '#fff', } }}
+                    label="Sign Up" />
+                <Tab
+                    sx={{ color: '#fff', '&.Mui-selected': { color: '#fff', }, }}
+                    label="Login" />
+            </Tabs>
+
+            <Box sx={{ p: 2 }}>
+                <SignUp currentIndex={value} handleButtonClick={handleButtonClick} />
+            </Box>
+        </Box>
+    )
+}
+
+export default Auth

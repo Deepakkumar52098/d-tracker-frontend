@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router-dom'
 import Navbar from '../common/Navbar'
 
-const MainLayout = () => {
+const MainLayout = ({setIsAuthenticated}) => {
   return (
     <>
-      <Navbar />
+      <Navbar setIsAuthenticated={setIsAuthenticated} />
       <main>
         <Outlet />
       </main>

@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 const pages = ['Dashboard', 'Transactions', 'Visualizations', 'Goals', 'Books Repo'];
 const settings = ['Profile', 'Logout'];
 
-const Navbar = () => {
+const Navbar = ({setIsAuthenticated}) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const navigate = useNavigate()
@@ -35,18 +35,22 @@ const Navbar = () => {
     else if (page === 'Transactions') {
       navigate('/transactions')
     }
-        else if (page === 'visualization') {
+    else if (page === 'visualization') {
       navigate('/visualization')
     }
-        else if (page === 'goals') {
+    else if (page === 'goals') {
       navigate('/goals')
     }
-        else if (page === 'booksRepo') {
+    else if (page === 'booksRepo') {
       navigate('/booksRepo')
     }
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (mode) => {
+    if (mode === 'Logout') {
+      localStorage.setItem('token', '')
+      setIsAuthenticated(false)
+    }
     setAnchorElUser(null);
   };
 
@@ -156,7 +160,7 @@ const Navbar = () => {
             onClose={handleCloseUserMenu}
           >
             {settings.map((setting) => (
-              <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
                 <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
               </MenuItem>
             ))}
