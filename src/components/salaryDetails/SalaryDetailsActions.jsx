@@ -1,6 +1,6 @@
 import { Box, Button } from '@mui/material'
 
-const SalaryDetailsActions = ({ handleUpdate }) => {
+const SalaryDetailsActions = ({ handleUpdate, mode }) => {
     return (
         <Box
             sx={{
@@ -14,7 +14,7 @@ const SalaryDetailsActions = ({ handleUpdate }) => {
                     color: 'white'
                 }}
                 onClick={handleUpdate}>
-                Update
+                {mode === 'Edit' ? 'Update' : 'Add'}
             </Button>
         </Box>
     )

@@ -16,7 +16,20 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 
-const DisplayDetails = ({ setInvokeApi, yearFilter, setYearFilter, salaryDetails, setIsError, setShowAlert, setAlertMessage }) => {
+const DisplayDetails = ({
+    setInvokeApi,
+    yearFilter,
+    setYearFilter,
+    salaryDetails,
+    setIsError,
+    setShowAlert,
+    setAlertMessage,
+    setOpenPopUp,
+    setModalTitle,
+    setIncome,
+    setSelectedDate,
+    setMode
+}) => {
 
     const yearFilterOptions = ['2026', '2025']
 
@@ -41,8 +54,13 @@ const DisplayDetails = ({ setInvokeApi, yearFilter, setYearFilter, salaryDetails
             })
     }
 
-    const handleEdit = () => {
+    const handleEdit = (e, data) => {
+        setOpenPopUp(true)
+        setModalTitle('Edit Income Details')
+        setMode('Edit')
 
+        setIncome(data.income)
+        setSelectedDate(data.date)
     }
 
     const getDate = (date) => {
@@ -150,7 +168,7 @@ const DisplayDetails = ({ setInvokeApi, yearFilter, setYearFilter, salaryDetails
                                         <DeleteIcon onClick={(e) => handleDelete(e, data)} />
                                     </IconButton>
                                     <IconButton>
-                                        <EditIcon onClick={handleEdit} />
+                                        <EditIcon onClick={(e) => handleEdit(e, data)} />
                                     </IconButton>
                                 </Box>
                                 }
