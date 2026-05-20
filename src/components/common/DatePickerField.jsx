@@ -7,22 +7,27 @@ const DatePickerField = ({
   label,
   handleDateChange,
   selectedDate,
-  mode
+  mode,
+  yearFilter
 }) => {
 
   const onDateChange = (val) => {
     handleDateChange(val)
   }
 
+  const isCurrentYear = String(yearFilter) === dayjs().format('YYYY')
+
+  console.log('isCurrentYear', isCurrentYear)
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
         label={label}
-        maxDate={dayjs()}
+        maxDate={isCurrentYear ? dayjs() : dayjs(`${yearFilter}-12-31`)}
+        minDate={dayjs(`${yearFilter}-01-01`)}
         value={dayjs(selectedDate)}
-        openTo="year"
-        views={['year', 'month']}
-        yearsOrder="desc"
+        openTo="month"
+        views={['month']}
         sx={{ minWidth: 250 }}
         disabled={mode === 'Edit'}
         onChange={(val) => onDateChange(val)}

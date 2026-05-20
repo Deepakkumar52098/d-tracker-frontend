@@ -1,10 +1,14 @@
+import { Grid } from '@mui/material'
 import SalaryDetails from '../salaryDetails/SalaryDetails'
 
 const Dashboard = () => {
   return (
-    <div>
+    <Grid item container>
+      <Grid item size={6}>
       <SalaryDetails/>
-    </div>
+      </Grid>
+    </Grid>
+    
   )
 }
 

@@ -1,14 +1,31 @@
+import { Box } from '@mui/material'
 import { Outlet } from 'react-router-dom'
 import Navbar from '../common/Navbar'
 
-const MainLayout = ({setIsAuthenticated}) => {
+const drawerWidth = 240
+
+const MainLayout = ({ setIsAuthenticated }) => {
+
   return (
-    <>
+
+    <Box sx={{ display: 'flex' }}>
+
       <Navbar setIsAuthenticated={setIsAuthenticated} />
-      <main>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          marginTop: '64px',
+          p: 3,
+          width: `calc(100% - ${drawerWidth}px)`,
+          minHeight: '90vh'
+        }}
+      >
         <Outlet />
-      </main>
-    </>
+      </Box>
+
+    </Box>
   )
 }
 

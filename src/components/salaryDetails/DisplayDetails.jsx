@@ -1,5 +1,6 @@
 import {
     Box,
+    Button,
     FormControl,
     IconButton,
     MenuItem,
@@ -15,50 +16,42 @@ import {
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import { API_CONSTANTS } from '../api/API_CONSTANTS'
+import { deleteSalaryDetails } from '../store/slices/salaryDetailsSlice'
+import { setModalDetails } from '../store/slices/modalSlice'
 
 const DisplayDetails = ({
-    setInvokeApi,
     yearFilter,
     setYearFilter,
     salaryDetails,
-    setIsError,
-    setShowAlert,
-    setAlertMessage,
-    setOpenPopUp,
-    setModalTitle,
     setIncome,
     setSelectedDate,
-    setMode
+    dispatch,
+    setInvokeApi
 }) => {
 
     const yearFilterOptions = ['2026', '2025']
 
+    const handleAddIncome = () => {
+        dispatch(setModalDetails({ title: 'Add Income Details', openPopup: true, mode: 'Add' }))
+    }
+
     const handleDelete = (event, data) => {
-        fetch('http://localhost:8080/salaryBreakup/deleteDetail/' + data._id, {
-            method: 'DELETE'
-        })
-            .then(async (res) => {
-                const data = await res.json()
-                setShowAlert(true)
-                if (res.status === 200) {
-                    setIsError(false)
-                    setAlertMessage(data.message)
-                    setInvokeApi(true)
-                    return
-                }
-                throw new Error(data.message)
-            })
-            .catch(err => {
-                setIsError(true)
-                setAlertMessage(err)
-            })
+        dispatch(deleteSalaryDetails({
+            method: API_CONSTANTS.DELETE_SALARY_DETAILS,
+            body: {
+                id: data._id
+            }
+        }))
+        setInvokeApi(true)
     }
 
     const handleEdit = (e, data) => {
-        setOpenPopUp(true)
-        setModalTitle('Edit Income Details')
-        setMode('Edit')
-
+        dispatch(setModalDetails({
+            title: 'Edit Income Details',
+            openPopup: true,
+            mode: 'Edit'
+        }))
         setIncome(data.income)
         setSelectedDate(data.date)
     }
@@ -74,8 +67,9 @@ const DisplayDetails = ({
     }
 
     const handleYearFilterChange = (e) => {
-        setYearFilter(e.target.value)
-        setInvokeApi(true)
+        const year = e.target.value
+        setYearFilter(year)
+        setSelectedDate(new Date(year))
     }
 
     return (
@@ -87,7 +81,8 @@ const DisplayDetails = ({
                             backgroundColor: '#1976d2',
                         }}
                     >
-                        <TableCell>
+                        <TableCell colSpan={2} sx={{
+                        }}>
                             <FormControl
                                 size="small"
                                 fullWidth
@@ -96,7 +91,7 @@ const DisplayDetails = ({
                                     flexDirection: 'row',
                                     justifyContent: 'start',
                                     alignItems: 'center',
-                                    borderRight: '1px solid black'
+                                    borderRight: '1px solid #ddd'
                                 }}>
                                 <Typography
                                     sx={{
@@ -116,7 +111,20 @@ const DisplayDetails = ({
                                 </Select>
                             </FormControl>
                         </TableCell>
-                        <TableCell colSpan={6} align='center'>Salary Breakup Details</TableCell>
+                        <TableCell colSpan={4} align='center'>Salary Breakup Details</TableCell>
+                        <TableCell sx={{ paddingLeft: 0 }} colSpan={2} align='center'>
+                            <Box sx={{ borderLeft: '1px solid #ddd' }}>
+                                <Button
+                                    onClick={handleAddIncome}
+                                    sx={{
+                                        color: '#000',
+                                        bgcolor: 'lightcyan',
+                                    }}
+                                >
+                                    Add Income
+                                </Button>
+                            </Box>
+                        </TableCell>
                     </TableRow>
                     <TableRow
                         sx={{

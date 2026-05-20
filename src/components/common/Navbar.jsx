@@ -1,9 +1,11 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import AppBar from '@mui/material/AppBar';
+import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import * as React from 'react';
+import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Avatar from '@mui/material/Avatar';
@@ -11,13 +13,17 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate } from 'react-router-dom';
+import Sidebar from './Sidebar';
 
-const pages = ['Dashboard', 'Transactions', 'Visualizations', 'Goals', 'Books Repo'];
+const pages = ['Dashboard', 'Transactions', 'Visualization', 'Goals'];
 const settings = ['Profile', 'Logout'];
 
-const Navbar = ({setIsAuthenticated}) => {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+const drawerWidth = 240;
+
+export default function Navbar({setIsAuthenticated}) {
+   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  
   const navigate = useNavigate()
 
   const handleOpenNavMenu = (event) => {
@@ -30,15 +36,15 @@ const Navbar = ({setIsAuthenticated}) => {
   const handleCloseNavMenu = (e, page) => {
     setAnchorElNav(null);
     if (page === 'Dashboard') {
-      navigate('/')
+      navigate('/dashboard')
     }
     else if (page === 'Transactions') {
       navigate('/transactions')
     }
-    else if (page === 'visualization') {
+    else if (page === 'Visualization') {
       navigate('/visualization')
     }
-    else if (page === 'goals') {
+    else if (page === 'Goals') {
       navigate('/goals')
     }
     else if (page === 'booksRepo') {
@@ -52,10 +58,11 @@ const Navbar = ({setIsAuthenticated}) => {
       setIsAuthenticated(false)
     }
     setAnchorElUser(null);
-  };
-
+  }
   return (
-    <AppBar position="static">
+    <Box sx={{ display: 'flex' }}>
+      <CssBaseline />
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
       <Toolbar disableGutters>
         <Typography
           variant="h6"
@@ -167,7 +174,18 @@ const Navbar = ({setIsAuthenticated}) => {
           </Menu>
         </Box>
       </Toolbar>
-    </AppBar>
+      </AppBar>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+        }}
+      >
+        <Toolbar />
+        <Sidebar/>
+      </Drawer>
+    </Box>
   );
 }
-export default Navbar;

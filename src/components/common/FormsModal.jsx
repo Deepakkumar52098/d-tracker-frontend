@@ -16,16 +16,12 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-export default function FormsModal({ title, openPopUp, setOpenPopUp, children, dialogActions }) {
-
-  const handleClose = () => {
-    setOpenPopUp(false);
-  };
+export default function FormsModal({ title, openPopUp, children, dialogActions, handleModalClose }) {
 
   return (
     <React.Fragment>
       <BootstrapDialog
-        onClose={handleClose}
+        onClose={handleModalClose}
         aria-labelledby="customized-dialog-title"
         open={openPopUp}
       >
@@ -34,7 +30,7 @@ export default function FormsModal({ title, openPopUp, setOpenPopUp, children, d
         </DialogTitle>
         <IconButton
           aria-label="close"
-          onClick={handleClose}
+          onClick={handleModalClose}
           sx={(theme) => ({
             position: 'absolute',
             right: 8,

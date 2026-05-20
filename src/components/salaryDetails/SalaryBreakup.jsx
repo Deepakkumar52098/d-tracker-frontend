@@ -1,7 +1,7 @@
 import { Box, InputLabel, TextField } from '@mui/material'
 import DatePickerField from '../common/DatePickerField'
 
-const SalaryBreakup = ({ setSelectedDate, handleInputChange, selectedDate, income, mode }) => {
+const SalaryBreakup = ({ setSelectedDate, handleInputChange, selectedDate, income, mode, yearFilter }) => {
 
     const onIncomeChange = (e) => {
         const value = Number(e.target.value)
@@ -20,6 +20,7 @@ const SalaryBreakup = ({ setSelectedDate, handleInputChange, selectedDate, incom
                     handleDateChange={onDateChange}
                     selectedDate={selectedDate}
                     mode={mode}
+                    yearFilter={yearFilter}
                 />
                 <InputLabel>Income</InputLabel>
                 <TextField value={income} onChange={(e) => onIncomeChange(e)} id="outlined-basic" variant="outlined" />

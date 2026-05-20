@@ -1,26 +1,18 @@
 import { Alert, AlertTitle, IconButton, Snackbar } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { useState } from 'react'
 
-const CustomAlert = ({ title, message, isError}) => {
-    const [open, setOpen] = useState(true)
-
-    console.log(message)
-
-    const handleClose = () => {
-        setOpen(false)
-    }
+const CustomAlert = ({ title, alertConfig, handleClose}) => {
 
     return (
         <Snackbar
-            open={open}
+            open={alertConfig?.open}
             anchorOrigin={{
                 vertical: 'bottom',
                 horizontal: 'right'
             }}
         >
             <Alert
-                severity={isError ? 'error': 'success'}
+                severity={alertConfig?.isError ? 'error': 'success'}
                 sx={{ minWidth: 300 }}
                 action={
                     <IconButton
@@ -33,7 +25,7 @@ const CustomAlert = ({ title, message, isError}) => {
                 }
             >
                 <AlertTitle>{title}</AlertTitle>
-                {message}
+                {alertConfig?.message}
             </Alert>
         </Snackbar>
     )

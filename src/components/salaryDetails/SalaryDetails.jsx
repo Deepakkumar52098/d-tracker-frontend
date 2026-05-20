@@ -1,166 +1,117 @@
-import { Button, Grid } from '@mui/material'
+/* eslint-disable react-hooks/set-state-in-effect */
+import { Grid } from '@mui/material'
 import DisplayDetails from './DisplayDetails'
 import SalaryBreakup from './SalaryBreakup'
 import { useEffect, useState } from 'react'
 import FormsModal from '../common/FormsModal'
 import SalaryDetailsActions from './SalaryDetailsActions'
 import CustomAlert from '../common/CustomAlert'
+import { useDispatch, useSelector } from 'react-redux'
+import { addSalaryDetails, editSalaryDetails, fetchSalaryBreakupDetails, resetAddSalaryDetails, resetDeleteSalaryDetails, resetEditSalaryDetails } from '../store/slices/salaryDetailsSlice'
+import { API_CONSTANTS } from '../api/API_CONSTANTS'
+import { setModalDetails } from '../store/slices/modalSlice'
 
 const SalaryDetails = () => {
-    const [invokeApi, setInvokeApi] = useState(true)
-    const [openPopUp, setOpenPopUp] = useState(false)
-    const [income, setIncome] = useState(0)
-    const [selectedDate, setSelectedDate] = useState(new Date())
-    const [showAlert, setShowAlert] = useState(false)
-    const [alertMessage, setAlertMessage] = useState('')
-    const [isError, setIsError] = useState(false)
-    const [salaryDetails, setSalaryDetails] = useState([])
-    const [yearFilter, setYearFilter] = useState('2026')
-    const [modalTitle, setModalTitle] = useState('')
-    const [mode, setMode] = useState('')
 
+    const date = new Date()
+    const [income, setIncome] = useState(0)
+    const [selectedDate, setSelectedDate] = useState(date)
+    const [yearFilter, setYearFilter] = useState(date.getFullYear())
+    const [invokeApi, setInvokeApi] = useState(false)
+    const [alertConfig, setAlertConfig] = useState({ open: false, message: '', isError: false })
+
+    const dispatch = useDispatch()
+
+    const {
+        salaryDetails,
+        deleteSalaryBreakupDetails,
+        editSalaryBreakupDetails,
+        addSalaryBreakupDetails
+    } = useSelector((state) => state.salaryBreakupDetails)
+    const { modalDetails } = useSelector((state) => state.modalDetails)
+    const { openPopup, modalTitle, mode } = modalDetails
 
     useEffect(() => {
-        if (invokeApi) {
-            fetch('http://localhost:8080/salaryBreakup/getDetails/' + yearFilter)
-                .then(res => {
-                    if (res.status === 200) {
-                        return res.json()
-                    }
-                    throw new Error('Failed to fetch details')
-                })
-                .then(data => {
-                    setSalaryDetails(data.breakupDetails)
-                    setInvokeApi(false)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+        dispatch(fetchSalaryBreakupDetails({
+            method: API_CONSTANTS.GET_SALARY_DETAILS,
+            yearFilter
+        }))
+        setInvokeApi(false)
+    }, [yearFilter, dispatch, invokeApi])
+
+    const showApiCompletionAlert = (apiState, resetAction) => {
+            console.log('apiState', apiState)
+        if (!apiState.loading && (apiState.message || apiState.error)) {
+            setAlertConfig({
+                open: true, message: apiState.message || apiState?.error?.error, isError: Boolean(apiState.message)
+
+            })
+            dispatch(resetAction())
         }
-    }, [invokeApi, setInvokeApi, yearFilter])
+    }
+
+    useEffect(() => {
+        showApiCompletionAlert(deleteSalaryBreakupDetails, resetDeleteSalaryDetails)
+        showApiCompletionAlert(editSalaryBreakupDetails, resetEditSalaryDetails)
+        showApiCompletionAlert(addSalaryBreakupDetails, resetAddSalaryDetails)
+    }, [deleteSalaryBreakupDetails, editSalaryBreakupDetails, addSalaryBreakupDetails])
+
 
     const handleInputChange = (value) => {
         setIncome(value)
     }
 
-    // const handleDateChange = (date) => {
-    //     setSelectedDate(date)
-    // }
+    const handleModalClose = () => {
+        setIncome(0)
+        setSelectedDate(date)
+        dispatch(setModalDetails({ title: '', openPopUp: false, mode: '' }))
+    }
 
     const handleUpdate = () => {
         if (mode === 'Edit') {
-            fetch('http://localhost:8080/salaryBreakup/editDetails', {
-                'method': 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            dispatch(editSalaryDetails({
+                method: API_CONSTANTS.EDIT_SALARY_DETAILS,
+                body: {
                     income,
-                    date: selectedDate,
-                })
-            })
-                .then(async (res) => {
-                    const data = await res.json()
-                    if (res.status === 201) {
-                        setIsError(false)
-                        setShowAlert(true)
-                        setAlertMessage(data.message)
-                        setOpenPopUp(false)
-                        setInvokeApi(true)
-                        return
-                    }
-                    setIsError(true)
-                    throw new Error(data.message)
-                })
-                .catch(err => {
-                    setAlertMessage(err.message)
-                    setShowAlert(true)
-                    setOpenPopUp(false)
-                })
-
+                    date: selectedDate
+                }
+            }))
         } else {
-            fetch('http://localhost:8080/salaryBreakup/addDetails', {
-                'method': 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            dispatch(addSalaryDetails({
+                method: API_CONSTANTS.ADD_SALARY_DETAILS,
+                body: {
                     income,
-                    date: selectedDate,
-                })
-            })
-                .then(async (res) => {
-                    const data = await res.json()
-                    if (res.status === 201) {
-                        setIsError(false)
-                        setShowAlert(true)
-                        setAlertMessage(data.message)
-                        setOpenPopUp(false)
-                        setInvokeApi(true)
-                        return
-                    }
-                    setIsError(true)
-                    throw new Error(data.message)
-                })
-                .catch(err => {
-                    setAlertMessage(err.message)
-                    setShowAlert(true)
-                    setOpenPopUp(false)
-
-                })
+                    date: selectedDate
+                }
+            }))
         }
-    }
-
-    const onClickOfAdd = () => {
-        setOpenPopUp(true)
-        setShowAlert(false)
-        setAlertMessage(null)
-        setModalTitle('Add Income Details')
-        setMode('Add')
+        setInvokeApi(true)
+        handleModalClose()
     }
 
     return (
         <Grid item
             container
-            spacing={2}
             sx={{
                 p: 2,
-                alignItems: "center",
             }}>
             <Grid item container size={12}>
-                <Button
-                    sx={{
-                        background: 'Green',
-                        color: 'white'
-                    }}
-                    onClick={onClickOfAdd}>
-                    Add Income
-                </Button>
-            </Grid>
-            <Grid item container size={6}>
-                {salaryDetails.length > 0 && <DisplayDetails
-                    invokeApi={invokeApi}
-                    setInvokeApi={setInvokeApi}
-                    openPopUp={openPopUp}
+                {salaryDetails?.data.length > 0 && <DisplayDetails
                     yearFilter={yearFilter}
                     setYearFilter={setYearFilter}
-                    salaryDetails={salaryDetails}
-                    setIsError={setIsError}
-                    setAlertMessage={setAlertMessage}
-                    setShowAlert={setShowAlert}
-                    setOpenPopUp={setOpenPopUp}
-                    setModalTitle={setModalTitle}
+                    salaryDetails={salaryDetails?.data}
                     setIncome={setIncome}
                     setSelectedDate={setSelectedDate}
-                    setMode={setMode}
+                    dispatch={dispatch}
+                    setInvokeApi={setInvokeApi}
                 />}
             </Grid>
             {
-                openPopUp &&
+                openPopup &&
                 <FormsModal
-                    openPopUp
-                    setOpenPopUp={setOpenPopUp}
+                    openPopUp={openPopup}
                     title={modalTitle}
+                    handleModalClose={handleModalClose}
                     dialogActions={
                         <SalaryDetailsActions
                             handleUpdate={handleUpdate}
@@ -174,12 +125,16 @@ const SalaryDetails = () => {
                         selectedDate={selectedDate}
                         income={income}
                         mode={mode}
+                        yearFilter={yearFilter}
                     />
                 </FormsModal>
             }
 
-            {showAlert && <CustomAlert title="Salary Breakup" message={alertMessage} isError={isError} />}
-
+            {alertConfig.open && <CustomAlert
+                title="Salary Breakup"
+                alertConfig={alertConfig}
+                handleClose={() => setAlertConfig((prev) => ({ ...prev, open: false, isError: false, message: '' }))}
+            />}
         </Grid>
     )
 }
