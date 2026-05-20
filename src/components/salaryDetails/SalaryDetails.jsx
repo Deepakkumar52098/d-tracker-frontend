@@ -39,8 +39,26 @@ const SalaryDetails = () => {
         setInvokeApi(false)
     }, [yearFilter, dispatch, invokeApi])
 
+    useEffect(() => {
+
+        if (!alertConfig.open) {
+            return
+        }
+
+        const timer = setTimeout(() => {
+            setAlertConfig((prev) => ({
+                ...prev,
+                open: false,
+                isError: false,
+                message: ''
+            }))
+        }, 5000)
+
+        return () => clearTimeout(timer)
+    }, [alertConfig])
+
     const showApiCompletionAlert = (apiState, resetAction) => {
-            console.log('apiState', apiState)
+        console.log('apiState', apiState)
         if (!apiState.loading && (apiState.message || apiState.error)) {
             setAlertConfig({
                 open: true, message: apiState.message || apiState?.error?.error, isError: Boolean(apiState.message)
@@ -62,8 +80,10 @@ const SalaryDetails = () => {
     }
 
     const handleModalClose = () => {
+        const isCurrentYear = yearFilter.toString() === date.getFullYear().toString()
+        const updatedDate = isCurrentYear ? date : new Date(yearFilter)
         setIncome(0)
-        setSelectedDate(date)
+        setSelectedDate(updatedDate)
         dispatch(setModalDetails({ title: '', openPopUp: false, mode: '' }))
     }
 
@@ -96,7 +116,7 @@ const SalaryDetails = () => {
                 p: 2,
             }}>
             <Grid item container size={12}>
-                {salaryDetails?.data.length > 0 && <DisplayDetails
+                {<DisplayDetails
                     yearFilter={yearFilter}
                     setYearFilter={setYearFilter}
                     salaryDetails={salaryDetails?.data}

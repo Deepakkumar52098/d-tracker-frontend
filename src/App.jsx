@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Dashboard from './components/dashboard/Dashboard'
@@ -7,27 +8,29 @@ import Goals from './components/goals/Goals'
 import BooksRepo from './components/booksRepo/BooksRepo'
 import MainLayout from './components/routes/MainLayout'
 import Auth from './components/auth/Auth'
-import { useState } from 'react'
+import { useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 
 function App() {
-  const token = localStorage.getItem('token')
+  const { loginDetails } = useSelector((state) => state.userDetails)
 
-  const [isAuthenticated, setIsAuthenticated] = useState(!!token)
-  const handleLogin = () => {
-    console.log("Logged In")
-    setIsAuthenticated(true)
-    localStorage.setItem('token', 'auth token')
-  }
+  useEffect(() => {
+    if (!loginDetails.loading && loginDetails.token) {
+      localStorage.setItem('token', loginDetails.token)
+    }
+  }, [loginDetails])
 
-  console.log(isAuthenticated)
+  const isAuthenticated = !!localStorage.getItem('token') || !!loginDetails.token
+
+  console.log('isAuthenticated', isAuthenticated)
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={ <Navigate to={isAuthenticated ? "/dashboard" : "/auth"} /> } />
-        <Route path="/auth" element={ isAuthenticated ? <Navigate to="/dashboard" /> : <Auth handleLogin={handleLogin} /> } />
-        <Route element={isAuthenticated ? <MainLayout setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/auth" />}>
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/auth"} />} />
+        <Route path="/auth" element={isAuthenticated ? <Navigate to="/dashboard" /> : <Auth />} />
+        <Route element={isAuthenticated ? <MainLayout /> : <Navigate to="/auth" />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/transactions" element={<Transactions />} />
           <Route path="/visualization" element={<Visualization />} />

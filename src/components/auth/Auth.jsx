@@ -2,18 +2,11 @@ import { Box, Tabs, Tab } from '@mui/material'
 import { useState } from 'react'
 import SignUp from './SignUp'
 
-const Auth = ({ handleLogin }) => {
+const Auth = () => {
     const [value, setValue] = useState(0)
 
     const handleChange = (event, newValue) => {
         setValue(newValue)
-    }
-
-    const handleButtonClick = () => {
-        // value 1 is Login & value 0 is Signup
-        if (value) {
-            handleLogin()
-        }
     }
 
     return (
@@ -45,7 +38,7 @@ const Auth = ({ handleLogin }) => {
             </Tabs>
 
             <Box sx={{ p: 2 }}>
-                <SignUp currentIndex={value} handleButtonClick={handleButtonClick} />
+                <SignUp currentIndex={value} />
             </Box>
         </Box>
     )

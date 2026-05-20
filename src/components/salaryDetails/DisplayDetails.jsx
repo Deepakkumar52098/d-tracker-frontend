@@ -68,8 +68,10 @@ const DisplayDetails = ({
 
     const handleYearFilterChange = (e) => {
         const year = e.target.value
+        const isCurrentYear = year === new Date().getFullYear().toString()
+        const updatedDate = isCurrentYear ? new Date() : new Date(year)
         setYearFilter(year)
-        setSelectedDate(new Date(year))
+        setSelectedDate(updatedDate)
     }
 
     return (

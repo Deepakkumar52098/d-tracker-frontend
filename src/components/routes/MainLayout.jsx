@@ -4,13 +4,13 @@ import Navbar from '../common/Navbar'
 
 const drawerWidth = 240
 
-const MainLayout = ({ setIsAuthenticated }) => {
+const MainLayout = () => {
 
   return (
 
     <Box sx={{ display: 'flex' }}>
 
-      <Navbar setIsAuthenticated={setIsAuthenticated} />
+      <Navbar/>
 
       <Box
         component="main"
