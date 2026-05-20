@@ -1,15 +1,27 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Box, Button, InputLabel, TextField } from '@mui/material'
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchLogin, fetchSignUp } from '../store/slices/authSlice'
 import { API_CONSTANTS } from '../api/API_CONSTANTS'
 
-const SignUp = ({ currentIndex }) => {
+const SignUp = ({ currentIndex, setValue }) => {
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [emailId, setEmailId] = useState('')
 
     const dispatch = useDispatch()
+
+    const { signUp } = useSelector((state) => state.userDetails)
+
+    useEffect(() => {
+        if (signUp?.isSuccess) {
+            setValue(1)
+            setUserName('')
+            setPassword('')
+            setEmailId('')
+        }
+    }, [signUp])
 
     const handleButtonClick = () => {
         // value 1 is Login & value 0 is Signup

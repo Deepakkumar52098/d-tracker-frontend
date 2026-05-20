@@ -54,11 +54,11 @@ export default function Navbar() {
 
   const handleCloseUserMenu = (mode) => {
     if (mode === 'Logout') {
-      localStorage.removeItem('token')
       dispatch(resetLoginDetails())
     }
     setAnchorElUser(null);
   }
+
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />

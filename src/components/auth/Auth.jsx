@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { Box, Tabs, Tab } from '@mui/material'
 import { useState } from 'react'
 import SignUp from './SignUp'
@@ -38,7 +39,7 @@ const Auth = () => {
             </Tabs>
 
             <Box sx={{ p: 2 }}>
-                <SignUp currentIndex={value} />
+                <SignUp currentIndex={value} setValue={setValue} />
             </Box>
         </Box>
     )

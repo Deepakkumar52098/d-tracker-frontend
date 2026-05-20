@@ -8,22 +8,13 @@ import Goals from './components/goals/Goals'
 import BooksRepo from './components/booksRepo/BooksRepo'
 import MainLayout from './components/routes/MainLayout'
 import Auth from './components/auth/Auth'
-import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 
 function App() {
+
   const { loginDetails } = useSelector((state) => state.userDetails)
-
-  useEffect(() => {
-    if (!loginDetails.loading && loginDetails.token) {
-      localStorage.setItem('token', loginDetails.token)
-    }
-  }, [loginDetails])
-
-  const isAuthenticated = !!localStorage.getItem('token') || !!loginDetails.token
-
-  console.log('isAuthenticated', isAuthenticated)
+  const isAuthenticated = !!loginDetails?.token
 
   return (
     <BrowserRouter>

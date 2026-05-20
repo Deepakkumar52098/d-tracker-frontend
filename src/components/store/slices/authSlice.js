@@ -3,8 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
-        signUp: { loading: false, message: '', error: '' },
-        loginDetails: { loading: false, message: '', error: '', userId: '', token: ''}
+        signUp: { loading: false, message: null, error: null, isSuccess: false },
+        loginDetails: {
+            loading: false, message: null, error: null, user: null,
+            token: localStorage.getItem('token') || null
+        }
     },
     reducers: {
         fetchSignUp(state) {
@@ -13,26 +16,32 @@ const authSlice = createSlice({
         setSignUp(state, action) {
             state.signUp.loading = false
             state.signUp.message = action.payload.message
+            state.signUp.isSuccess = true
         },
         setSignUpError(state, action) {
             state.signUp.loading = false
-            state.signUp.message = action.payload
+            state.signUp.error = action.payload
         },
         fetchLogin(state) {
             state.loginDetails.loading = true
+            state.loginDetails.error = null
+            state.loginDetails.message = null
         },
         setLogin(state, action) {
             state.loginDetails.loading = false
-            state.loginDetails.userId = action.payload.userId
+            state.loginDetails.user = action.payload.user
             state.loginDetails.message = action.payload.message
             state.loginDetails.token = action.payload.token
+            localStorage.setItem('token', action.payload.token)
         },
         setLoginError(state, action) {
             state.loginDetails.loading = false
-            state.loginDetails.message = action.payload
+            state.loginDetails.error = action.payload
         },
-                resetLoginDetails(state) {
-            state.loginDetails = { loading: false, error: '', message: '' }
+        resetLoginDetails(state) {
+            state.loginDetails = { loading: false, error: null, message: null }
+            localStorage.removeItem('token')
+
         },
     }
 })
